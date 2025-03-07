@@ -242,7 +242,7 @@
         }
 
         try {
-            const response = await fetch(`${apiUrl}/shorten`, {
+            const response = await fetch(`${apiUrl}/links`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(requestBody),
@@ -347,15 +347,13 @@
 
         const requestBody = { original_url: originalUrl };
         if (shortCode) {
-            requestBody.short_code = shortCode; // Добавляем только если не пусто
+            var response = await apiRequest('links', 'POST', { original_url: originalUrl, short_code: shortCode });
+        } else {
+            var response = await apiRequest('links', 'POST', { original_url: originalUrl});
         }
 
 
-        const response = await fetch(`${apiUrl}/shorten`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(requestBody),
-        });
+
 
         if (response) {
             await loadUserLinks();
@@ -364,7 +362,7 @@
     });
 
     async function loadUserLinks() {
-        const links = await apiRequest('get-all-links');
+        const links = await apiRequest('links');
         if (!links) return;
 
         linksTable.innerHTML = '';
@@ -410,7 +408,7 @@
         const newUrl = prompt('Enter the new original URL:');
         if (!newUrl) return;
 
-        const response = await apiRequest(`link/${shortCode}`, 'PUT', { original_url: newUrl, new_short_code: shortCode});
+        const response = await apiRequest(`links/${shortCode}`, 'PUT', { original_url: newUrl, new_short_code: shortCode});
         if (response) {
             alert('Link updated successfully');
             loadUserLinks();
@@ -422,7 +420,7 @@
     async function deleteLink(shortCode) {
         if (!confirm('Are you sure you want to delete this link?')) return;
 
-        const response = await apiRequest(`delete_link/${shortCode}`, 'DELETE');
+        const response = await apiRequest(`links/${shortCode}`, 'DELETE');
         if (response) {
             alert('Link deleted successfully');
             loadUserLinks();
@@ -433,7 +431,7 @@
 
     async function deleteUser(id) {
         if (confirm('Are you sure you want to delete this user?')) {
-            await apiRequest(`admin/delete-user/${id}`, 'DELETE');
+            await apiRequest(`admin/users/${id}`, 'DELETE');
             loadUsers();
         }
     }
