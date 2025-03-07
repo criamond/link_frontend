@@ -1,0 +1,15 @@
+<IfModule mod_rewrite.c>
+RewriteEngine On
+
+# Разрешаем прямой доступ к статическим файлам (CSS, JS, изображения)
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Если запрос корневой ("/"), загружаем index.html
+RewriteRule ^$ index.html [L]
+
+# Если запрос НЕ пустой, редиректим его на API
+RewriteCond %{REQUEST_URI} !^/$
+RewriteRule ^(.*)$ http://api.link.loc/$1 [L,R=302]
+</IfModule>
